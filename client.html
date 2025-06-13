@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head><title>Avatar Client</title></head>
+<body>
+  <button onclick="start()">Start Call</button>
+  <video id="video" autoplay playsinline></video>
+
+  <script>
+    let ws, pc;
+
+    async function start() {
+      console.log("Starting WebRTC call...");
+
+      // 1. Setup WebSocket for signaling
+      ws = new WebSocket("ws://localhost:8080/ws");
+      ws.onopen = () => console.log("✅ WS open");
+      ws.onerror = e => console.error("❌ WS error", e);
+
+      ws.onmessage = async (e) => {
+        console.log("📩 WS message:", e.data);
+        const msg = JSON.parse(e.data);
+
+        if (msg.sdp) {
+          console.log("🔄 SDP received:", msg.type);
+          await pc.setRemoteDescription(msg);
+        } else if (msg.candidate) {
+          console.log("⛳ ICE candidate from server:", msg.candidate);
+          await pc.addIceCandidate({ candidate: msg.candidate });
+        }
+      };
+
+      // 2. Create RTCPeerConnection and bind handlers
+      pc = new RTCPeerConnection();
+      pc.onicecandidate = e => console.log("🧩 Client ICE:", e.candidate);
+      pc.oniceconnectionstatechange = () =>
+        console.log("🌐 ICE state:", pc.iceConnectionState);
+      pc.ontrack = e => {
+        console.log("🎬 Track received", e);
+        document.getElementById("video").srcObject = e.streams[0];
+      };
+
+      // 3. Create offer and send to signaling server
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      console.log("📣 Sending SDP offer to server");
+      ws.send(JSON.stringify({ sdp: offer.sdp, type: offer.type }));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+vosk sounddevice
+transformers torch
+TTS
+wav2lip  
+aiortc
