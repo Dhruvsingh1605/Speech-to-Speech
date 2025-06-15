@@ -26,7 +26,7 @@ async def process_text(text, audio_q, video_q):
 
 @routes.get("/")
 async def index(req):
-    return web.FileResponse("client/index.html")
+    return web.FileResponse("client.html")
 
 @routes.get("/ws")
 async def websocket_handler(request):
