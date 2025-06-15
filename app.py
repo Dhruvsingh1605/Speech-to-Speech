@@ -21,10 +21,12 @@ async def pipeline(audio_q, video_q):
 async def process_text(text, audio_q, video_q):
     resp = generate(text)
     for chunk in stream_tts(resp):
+        print(f"[Pipeline] putting audio chunk, size: {len(chunk)}")
         await audio_q.put(chunk)
         mels = audio_bytes_to_mel_chunks(chunk)
         for mel in mels:
             frame = sync(mel)
+            print("[Pipeline] putting video frame")
             await video_q.put(frame)
 
 routes = web.RouteTableDef()

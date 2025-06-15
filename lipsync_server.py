@@ -8,7 +8,7 @@ from Wav2Lip.models.wav2lip import Wav2Lip
 
 model = torch.jit.load(
     "/home/dhruv/Desktop/S-T-T_Pipeline/Wav2Lip/checkpoints/Wav2Lip-SD-GAN.pt",
-    map_location="cuda"  # use "cpu" if no GPU
+    map_location="cuda"  
 ).eval().cuda()
 
 

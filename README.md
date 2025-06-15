@@ -211,3 +211,47 @@ Processes microphone input, generates audio and video frames, and sends media vi
 Terminal 3 (http.server 8000):
 Makes client.html accessible in your browser at http://localhost:8000/client.html.
 
+
+🎙 Step-by-Step Workflow
+1. User Clicks “Start Call”
+
+2 .Browser opens a WebSocket to ws://localhost:8080/ws.
+
+3. Creates an RTCPeerConnection and sends an SDP offer via WS.
+
+4. Server Handles Signaling
+
+5. Accepts the offer, creates an answer, and performs ICE negotiation.
+
+6. ICE completes → connection becomes “connected.”
+
+7. Media Tracks Are Attached
+
+8. The server attaches AudioStreamTrack (outgoing audio from LLM) and VideoStreamTrack (outgoing lip-synced video frames) to the PeerConnection.
+
+9. The pipeline is started in the background.
+
+You Speak
+
+10. Your voice is not streamed to the server yet — this is a one-way media flow (server → client).
+
+11. However, the ASR module on the server listens to audio input (this assumes you also record and send microphone data — if you want two-way live speech, you’ll need to implement incoming audio capture from the browser and stream it up).
+
+12. ASR → LLM → TTS → Lip-Sync → Media Streaming
+Inside the pipeline:
+
+13. Your speech is transcribed by Vosk (transcribe).
+
+14. Transcription is passed to the LLM for a contextual response.
+
+15 .TTS generates streaming chunks of speech.
+
+16. Wav2Lip synchronizes those chunks to create lip-synced video frames of your avatar.
+
+17. Frames and audio are queued and delivered via WebRTC tracks.
+
+18. Client Receives Media
+
+19. The browser’s pc.ontrack handler receives and plays the media.
+
+You see and hear the avatar speaking back with a contextually appropriate response.

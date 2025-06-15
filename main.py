@@ -8,6 +8,9 @@ from tts_server import stream_tts
 from lipsync_server import sync
 from webrtc_stream import run
 from signaling_server import pcs
+from PIL import Image
+
+preload_face_img = Image.open("avatar_face.png").convert("RGB")
 
 audio_q = asyncio.Queue()
 video_q = asyncio.Queue()

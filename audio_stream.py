@@ -13,7 +13,8 @@ class AudioStreamTrack(MediaStreamTrack):
         self._ts = 0
 
     async def recv(self):
-        samples = await self.audio_queue.get()  # numpy shape (N,)
+        samples = await self.audio_queue.get()
+        print(f"[Audio recv] got {len(samples)} samples")
         fmt = 'flt' if samples.dtype == np.float32 else 's16'
         frame = av.AudioFrame.from_ndarray(samples, format=fmt, layout='mono')
         frame.sample_rate = self.sample_rate
